@@ -8,6 +8,8 @@ public class Aluno implements Serializable {
     private String nome;
     private String cpf;
     private String telefone;
+    private String endereco;
+    private String curso;
 
     public Integer getId() {
         return id;
@@ -41,6 +43,22 @@ public class Aluno implements Serializable {
         this.telefone = telefone;
     }
 
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
+
+    public String getCurso() {
+        return curso;
+    }
+
+    public void setCurso(String curso) {
+        this.curso = curso;
+    }
+
     @Override
     public String toString() {
         return "Aluno{" +
@@ -48,6 +66,8 @@ public class Aluno implements Serializable {
                 ", nome='" + nome + '\'' +
                 ", cpf='" + cpf + '\'' +
                 ", telefone='" + telefone + '\'' +
+                ", endereco='" + endereco + '\'' +
+                ", curso='" + curso + '\'' +
                 '}';
     }
 }
