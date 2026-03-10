@@ -61,13 +61,6 @@ public class Aluno implements Serializable {
 
     @Override
     public String toString() {
-        return "Aluno{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", cpf='" + cpf + '\'' +
-                ", telefone='" + telefone + '\'' +
-                ", endereco='" + endereco + '\'' +
-                ", curso='" + curso + '\'' +
-                '}';
+        return nome;
     }
 }
