@@ -93,4 +93,18 @@ public class AlunoDao {
         if (telefone.length() != 10 && telefone.length() != 11) return false;
         return telefone.matches("\\d+");
     }
+
+    public void excluir(Aluno a){
+        banco.delete("aluno", "id = ?",new String[]{a.getId().toString()}); // no lugar do ? vai colocar o id do aluno
+    }
+
+    public void atualizar(Aluno aluno){
+        ContentValues values = new ContentValues(); //valores que irei inserir
+        values.put("nome", aluno.getNome());
+        values.put("cpf", aluno.getCpf());
+        values.put("telefone", aluno.getTelefone());
+        values.put("endereco", aluno.getEndereco());
+        values.put("curso", aluno.getCurso());
+        banco.update("aluno", values, "id = ?", new String[]{aluno.getId().toString()});
+    }
 }
