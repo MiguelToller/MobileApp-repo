@@ -25,6 +25,7 @@ public class AlunoDao {
         values.put("telefone", aluno.getTelefone());
         values.put("endereco", aluno.getEndereco());
         values.put("curso", aluno.getCurso());
+        values.put("fotoBytes", aluno.getFotoBytes());
         return banco.insert("aluno", null, values);
     }
 
@@ -33,7 +34,7 @@ public class AlunoDao {
         // cursor aponta para as linhas retornadas
         Cursor cursor = banco.query(
                 "aluno",
-                new String[]{"id", "nome", "cpf", "telefone", "endereco", "curso"},
+                new String[]{"id", "nome", "cpf", "telefone", "endereco", "curso", "fotoBytes"},
                 null,
                 null,
                 null,
@@ -47,10 +48,13 @@ public class AlunoDao {
             Aluno a = new Aluno();
 
             // new String[]{"id","nome","cpf","telefone"}
-            a.setId(cursor.getInt(0));        // id = coluna 0
-            a.setNome(cursor.getString(1));   // nome = coluna 1
-            a.setCpf(cursor.getString(2));    // cpf = coluna 2
+            a.setId(cursor.getInt(0));          // id = coluna 0
+            a.setNome(cursor.getString(1));     // nome = coluna 1
+            a.setCpf(cursor.getString(2));      // cpf = coluna 2
             a.setTelefone(cursor.getString(3)); // telefone = coluna 3
+            a.setEndereco(cursor.getString(4)); // endereco = coluna 4
+            a.setEndereco(cursor.getString(5)); // curso = coluna 5
+            a.setFotoBytes(cursor.getBlob(6));  // foto = coluna 6
 
             alunos.add(a);
         }
@@ -105,6 +109,7 @@ public class AlunoDao {
         values.put("telefone", aluno.getTelefone());
         values.put("endereco", aluno.getEndereco());
         values.put("curso", aluno.getCurso());
+        values.put("fotoBytes", aluno.getFotoBytes());
         banco.update("aluno", values, "id = ?", new String[]{aluno.getId().toString()});
     }
 }
