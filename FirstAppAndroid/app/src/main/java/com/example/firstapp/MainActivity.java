@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private AlunoDao dao;
     private Aluno aluno = null;
     private ImageView imageView;
+    private AlunoDaoRoom alunoDaoRoom;
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int REQUEST_IMAGE_CAPTURE = 200;
 
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         curso = findViewById(R.id.editCurso);
         imageView = findViewById(R.id.imageView);
         Button btnTakePhoto = findViewById(R.id.btnTakePhoto);
+
+        alunoDaoRoom = AppDatabase.getInstance(this).alunoDaoRoom();
 
         dao = new AlunoDao(this);
 
@@ -85,10 +88,21 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        if (!dao.isCPFValido(cpfDigitado)) {
+            cpf.setError("CPF Inválido!");
+            return;
+        }
+
+        if (!dao.isTelefoneValido(telefoneDigitado)) {
+            telefone.setError("Telefone Inválido!");
+            return;
+        }
+
         // aluno ==null cadastrar, aluno!=null esta recebendo do ListarAlunos
-        if (aluno == null) {
-            // Criar objeto Aluno
-            aluno = new Aluno();
+        if (aluno == null || aluno.getId() == null) {
+            if(aluno == null) {
+                aluno = new Aluno();
+            }
             aluno.setNome(nomeDigitado);
             aluno.setCpf(cpfDigitado);
             aluno.setTelefone(telefoneDigitado);

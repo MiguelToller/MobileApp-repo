@@ -28,6 +28,7 @@ public class ListarAlunosActivity extends AppCompatActivity {
     private List<Aluno> alunos;
     private List<Aluno> alunosFiltrados = new ArrayList<>();
     private ArrayAdapter<Aluno> adaptador;
+    private AlunoDaoRoom alunoDaoRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,8 @@ public class ListarAlunosActivity extends AppCompatActivity {
         //colocar dentro do método onCreate() do ListarAlunosActivity
         //registrar o menu de contexto (excluir e atualizar) na listview
         registerForContextMenu(listView);
+
+        alunoDaoRoom = AppDatabase.getInstance(this).alunoDaoRoom();
     }
 
     public void voltarParaCadastro(View view) {

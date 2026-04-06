@@ -1,17 +1,29 @@
 package com.example.firstapp;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.io.Serializable;
 
+@Entity(tableName = "aluno")
 public class Aluno implements Serializable {
 
+    @PrimaryKey(autoGenerate = true)
     private Integer id;
+    @ColumnInfo(name = "nome")
     private String nome;
+    @ColumnInfo(name = "cpf")
     private String cpf;
+    @ColumnInfo(name = "telefone")
     private String telefone;
+    @ColumnInfo(name = "endereco")
     private String endereco;
+    @ColumnInfo(name = "curso")
     private String curso;
 
     // =============== CAMERA ===================
+    @ColumnInfo(name = "foto")
     private byte[] fotoBytes;
 
     public byte[] getFotoBytes() {

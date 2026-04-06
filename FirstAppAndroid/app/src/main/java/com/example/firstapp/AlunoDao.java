@@ -53,7 +53,7 @@ public class AlunoDao {
             a.setCpf(cursor.getString(2));      // cpf = coluna 2
             a.setTelefone(cursor.getString(3)); // telefone = coluna 3
             a.setEndereco(cursor.getString(4)); // endereco = coluna 4
-            a.setEndereco(cursor.getString(5)); // curso = coluna 5
+            a.setCurso(cursor.getString(5)); // curso = coluna 5
             a.setFotoBytes(cursor.getBlob(6));  // foto = coluna 6
 
             alunos.add(a);
