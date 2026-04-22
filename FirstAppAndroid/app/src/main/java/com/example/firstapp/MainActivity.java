@@ -195,26 +195,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // TRATAMENTO DA CÂMERA (Você já tem esse)
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
-
             Bundle extras = data.getExtras();
-
             if (extras != null && extras.get("data") != null) {
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
-
                 imageView.setImageBitmap(imageBitmap);
-
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
-
-                if (aluno == null) {
-                    aluno = new Aluno();
-                }
-
+                if (aluno == null) aluno = new Aluno();
                 aluno.setFotoBytes(byteArray);
             }
         }
+
+        // TRATAMENTO DO CEP (Adicione este bloco aqui!)
+        else if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
+            // Recupera a String formatada que enviamos da CepActivity
+            String resultadoEndereco = data.getStringExtra("endereco_completo");
+
+            // Seta o texto no seu EditText 'endereco' que você já declarou no onCreate
+            if (resultadoEndereco != null) {
+                endereco.setText(resultadoEndereco);
+                Toast.makeText(this, "Endereço atualizado!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void abrirTelaCep(View view) {
+        Intent it = new Intent(this, CepActivity.class);
+        startActivityForResult(it, 100); // O código 100 é apenas um identificador
     }
 
 }

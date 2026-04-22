@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
@@ -29,11 +30,14 @@ public class ListarAlunosActivity extends AppCompatActivity {
     private List<Aluno> alunosFiltrados = new ArrayList<>();
     private ArrayAdapter<Aluno> adaptador;
     private AlunoDaoRoom alunoDaoRoom;
+    private EditText editPesquisa;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listar_alunos);
+
+        editPesquisa = findViewById(R.id.editPesquisa);
 
         listView = findViewById(R.id.lista_alunos);
         dao = new AlunoDao(this);
@@ -41,7 +45,7 @@ public class ListarAlunosActivity extends AppCompatActivity {
         alunos = dao.obterTodos();      // Todos os alunos
         alunosFiltrados.addAll(alunos); // Alunos filtrados
 
-        adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
+        adaptador = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunosFiltrados);
         listView.setAdapter(adaptador);
 
         //colocar dentro do método onCreate() do ListarAlunosActivity
@@ -143,12 +147,10 @@ public class ListarAlunosActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        alunosFiltrados.clear();
+
         // Recarrega todos os alunos do banco de dados
         alunos = dao.obterTodos();
-
-        // Atualiza a lista filtrada
-        alunosFiltrados.clear();
-        alunosFiltrados.addAll(alunos);
 
         // Cria e define o adapter para a ListView
         ArrayAdapter<Aluno> adaptador = new ArrayAdapter<>(
@@ -158,6 +160,24 @@ public class ListarAlunosActivity extends AppCompatActivity {
         );
 
         listView.setAdapter(adaptador);
+    }
+
+    public void pesquisarAluno(View view) {
+        // 1. Pega o texto do EditText corretamente através da variável 'editPesquisa'
+        String textoBusca = editPesquisa.getText().toString();
+
+        // 2. Chama o DAO e recebe a nova lista filtrada
+        List<Aluno> busca = dao.obterAlunosPorNome(textoBusca);
+
+        // 3. Limpa a lista que o adaptador está usando (alunosFiltrados)
+        alunosFiltrados.clear();
+
+        // 4. Adiciona os novos resultados
+        alunosFiltrados.addAll(busca);
+
+        // 5. Avisa o adaptador que os dados mudaram para ele atualizar a tela
+        // Note que usei 'adaptador', que é o nome da sua variável global
+        ((ArrayAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
 
 }

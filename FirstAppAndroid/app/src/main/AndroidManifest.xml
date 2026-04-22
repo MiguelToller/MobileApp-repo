@@ -6,6 +6,7 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!--==================================-->
 
@@ -32,6 +33,11 @@
             android:name=".ListarAlunosActivity"
             android:exported="true">
         </activity>
+
+        <activity
+            android:name=".CepActivity"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

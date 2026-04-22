@@ -112,4 +112,37 @@ public class AlunoDao {
         values.put("fotoBytes", aluno.getFotoBytes());
         banco.update("aluno", values, "id = ?", new String[]{aluno.getId().toString()});
     }
+
+    public List<Aluno> obterAlunosPorNome(String nome) {
+        List<Aluno> alunos = new ArrayList<>();
+
+        // O segredo está aqui: o WHERE (selection) e os argumentos (selectionArgs)
+        // O operador LIKE com % busca qualquer parte do nome
+        Cursor cursor = banco.query(
+                "aluno",
+                new String[]{"id", "nome", "cpf", "telefone", "endereco", "curso", "fotoBytes"},
+                "nome LIKE ?",
+                new String[]{"%" + nome + "%"},
+                null,
+                null,
+                null
+        );
+
+        // O loop de preenchimento é IDÊNTICO ao seu obterTodos
+        while (cursor.moveToNext()) {
+            Aluno a = new Aluno();
+            a.setId(cursor.getInt(0));
+            a.setNome(cursor.getString(1));
+            a.setCpf(cursor.getString(2));
+            a.setTelefone(cursor.getString(3));
+            a.setEndereco(cursor.getString(4));
+            a.setCurso(cursor.getString(5));
+            a.setFotoBytes(cursor.getBlob(6));
+            alunos.add(a);
+        }
+
+        return alunos;
+    }
+
+
 }
