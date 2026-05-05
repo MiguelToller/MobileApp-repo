@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'telas/tela_01.dart';
 import 'telas/tela_02.dart';
-
+import 'exemplos/cadastro.dart';
+import 'exemplos/listar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,26 +11,33 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'App de Clientes',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      // Definição das rotas
       initialRoute: '/',
       routes: {
         '/': (context) => const PrimeiraTela(),
         '/segunda': (context) => const SegundaTela(),
+        '/cadastro': (context) => const CadastroClientePage(),
+        '/listar': (context) => const ListarClientesPage(),
       },
     );
   }
 }
 
 class MyText extends StatelessWidget {
-  const MyText ({super.key});
+  const MyText({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Text (
+    return Text(
       'Hello World!',
       style: TextStyle(
         fontSize: 32,
@@ -41,7 +49,7 @@ class MyText extends StatelessWidget {
 }
 
 class MyTextStateful extends StatefulWidget {
-  const MyTextStateful ({super.key});
+  const MyTextStateful({super.key});
 
   @override
   State<MyTextStateful> createState() => _MyTextStatefulState();
@@ -56,7 +64,7 @@ class _MyTextStatefulState extends State<MyTextStateful> {
     });
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     // Retorne apenas o conteúdo, sem criar um "novo app" aqui dentro
     return Column(

@@ -1,43 +1,71 @@
 import 'package:flutter/material.dart';
 
-// Define a classe da Primeira Tela, que é um widget sem estado (StatelessWidget)
 class PrimeiraTela extends StatelessWidget {
-  const PrimeiraTela({super.key}); // Construtor da PrimeiraTela, recebendo uma Key opcional
+  const PrimeiraTela({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Método build: monta a interface gráfica da tela
-    // Scaffold cria a estrutura básica da tela (AppBar + Body)
-    return Scaffold( 
-      // Cria a barra superior (AppBar)
-      appBar: AppBar( 
-        title: const Text('Primeira Tela'), // Texto mostrado na AppBar
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Menu Principal'),
+        backgroundColor: Colors.blue.shade100,
       ),
-      // Centraliza todo o conteúdo no meio da tela
-      body: Center( 
-        // Organiza vários widgets em coluna (um abaixo do outro)
-        child: Column( 
-          mainAxisAlignment: MainAxisAlignment.center, // Alinha os widgets verticalmente ao centro
-          // Lista de widgets filhos
-          children: [ 
-            const Text( 
-              'Olá, Flutter!', 
-              style: TextStyle( 
-                fontSize: 32, 
-                fontWeight: FontWeight.bold, // Fonte em negrito
-                color: Colors.blue, // Cor azul para o texto
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment
+                .stretch, // Faz os botões ocuparem a mesma largura
+            children: [
+              const Icon(
+                Icons.account_tree_outlined,
+                size: 80,
+                color: Colors.blue,
               ),
-            ),
-            const SizedBox(height: 20), // Espaço em branco de 20 pixels entre o texto e o botão
-            // Botão elevado (estilo Material Design)
-            ElevatedButton( 
-              // Função chamada quando o botão for pressionado
-              onPressed: () { 
-                Navigator.pushNamed(context, '/segunda'); // Navega para a rota '/segunda'
-              },
-              child: const Text('Ir para a Segunda Tela'), // Texto que aparece dentro do botão
-            ),
-          ],
+              const SizedBox(height: 30),
+
+              // Botão para Tela de Cadastro
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/cadastro');
+                },
+                icon: const Icon(Icons.person_add),
+                label: const Text('Cadastrar Novo Cliente'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(15),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // Botão para Tela de Listagem
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/listar');
+                },
+                icon: const Icon(Icons.list),
+                label: const Text('Ver Lista de Clientes'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(15),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              // Botão para a antiga Tela 02
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/segunda');
+                },
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text('Ir para Tela 02 (Exemplo)'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.all(15),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
