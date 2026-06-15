@@ -1,0 +1,21 @@
+# Dependências do Node (MUITO PESADO, NUNCA SUBIR PRO GIT)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Pastas geradas pelo Expo e Builds
+.expo/
+dist/
+web-build/
+build/
+
+# Pastas Nativas geradas (se tiver)
+android/
+ios/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Variáveis de Ambiente
+.env
