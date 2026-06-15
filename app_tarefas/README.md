@@ -1,6 +1,6 @@
-# 🚀 App Tarefas (Premium UI)
+# 🚀 App Tarefas
 
-Aplicativo mobile focado no gerenciamento de tarefas, projetado com uma interface de usuário moderna (Premium Dark Theme) e animações fluidas. Foi desenvolvido utilizando **React Native** e **Expo**, com foco em usabilidade, escalabilidade (arquitetura componentizada) e segurança na tipagem com TypeScript.
+Aplicativo mobile focado no gerenciamento de tarefas, projetado com uma interface de usuário moderna e animações fluidas. Foi desenvolvido utilizando **React Native** e **Expo**, com foco em usabilidade, escalabilidade e segurança na tipagem com TypeScript.
 
 ## ✨ Funcionalidades
 
@@ -96,4 +96,3 @@ app_tarefas/
 ```
 
 ---
-*Desenvolvido com dedicação e focado em uma excelente experiência do usuário.*
