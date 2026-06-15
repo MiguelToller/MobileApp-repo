@@ -2,380 +2,228 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
   StyleSheet,
-  Alert,
+  TouchableOpacity,
+  Modal,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
 } from 'react-native';
+import { Task } from '../types';
+import TaskCard from '../components/TaskCard';
+import TaskForm from '../components/TaskForm';
 
+/**
+ * Tela principal do aplicativo de Tarefas.
+ * Gerencia a lista de tarefas cadastradas, exibindo-as em uma ScrollView e 
+ * controlando a abertura do Modal que contém o formulário (TaskForm).
+ */
 export default function AppTarefas() {
-  // Estados para armazenar os valores dos campos
-  const [titulo, setTitulo] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [dataVencimento, setDataVencimento] = useState('');
-  const [responsavel, setResponsavel] = useState('');
-
-  // Estado para armazenar a lista de tarefas
-  const [tarefas, setTarefas] = useState([]);
-  
-  // Estado auxiliar para gerar IDs únicos
+  const [tarefas, setTarefas] = useState<Task[]>([]);
   const [proximoId, setProximoId] = useState(1);
 
-  // Estado para controlar se estamos editando uma tarefa (armazena o ID da tarefa)
-  const [tarefaEditandoId, setTarefaEditandoId] = useState(null);
+  // Controle do Modal
+  const [modalVisivel, setModalVisivel] = useState(false);
+  const [tarefaEditando, setTarefaEditando] = useState<Task | null>(null);
 
-  // Estado para exibir mensagens de erro na tela
-  const [erroMsg, setErroMsg] = useState('');
+  // Ações do formulário
 
-  // Função para limpar os campos do formulário
-  function limparFormulario() {
-    setTitulo('');
-    setDescricao('');
-    setDataVencimento('');
-    setResponsavel('');
-    setTarefaEditandoId(null);
-    setErroMsg('');
-  }
-
-  // Função responsável por cadastrar ou atualizar a tarefa
-  function salvarTarefa() {
-    setErroMsg(''); // Limpa mensagens anteriores
-
-    // 1. Verificação dos campos inválidos
-    if (titulo.trim() === '') {
-      setErroMsg('O título da tarefa é obrigatório.');
-      return;
-    }
-    if (descricao.trim() === '') {
-      setErroMsg('A descrição da tarefa é obrigatória.');
-      return;
-    }
-    if (dataVencimento.trim() === '') {
-      setErroMsg('A data de vencimento é obrigatória.');
-      return;
-    }
-    if (responsavel.trim() === '') {
-      setErroMsg('O responsável é obrigatório.');
-      return;
-    }
-
-    // Se estivermos editando uma tarefa existente
-    if (tarefaEditandoId !== null) {
-      const listaAtualizada = tarefas.map(tarefa => {
-        if (tarefa.id === tarefaEditandoId) {
-          return {
-            ...tarefa,
-            titulo,
-            descricao,
-            dataVencimento,
-            responsavel
-          };
-        }
-        return tarefa;
-      });
-      
+  /**
+   * Função executada quando o usuário salva o formulário.
+   * Cria uma nova tarefa se não estiver em modo de edição ou atualiza a tarefa existente.
+   * 
+   * @param novaTarefaData Os dados validados da tarefa vindos do formulário.
+   */
+  function handleSalvarTarefa(novaTarefaData: Omit<Task, 'id'>) {
+    if (tarefaEditando) {
+      const listaAtualizada = tarefas.map(t =>
+        t.id === tarefaEditando.id ? { ...t, ...novaTarefaData } : t
+      );
       setTarefas(listaAtualizada);
-      // Removemos o Alert pois na web ele pode ser bloqueado pelo navegador
-    } 
-    // Se for uma nova tarefa
-    else {
-      const novaTarefa = {
+    } else {
+      const novaTarefa: Task = {
         id: proximoId,
-        titulo,
-        descricao,
-        dataVencimento,
-        responsavel,
+        ...novaTarefaData,
       };
-
-      setTarefas([...tarefas, novaTarefa]);
+      setTarefas([novaTarefa, ...tarefas]); // Adiciona no início da lista
       setProximoId(proximoId + 1);
-      // Removemos o Alert pois na web ele pode ser bloqueado pelo navegador
     }
-    
-    // Limpa o formulário e sai do modo de edição
-    limparFormulario();
+    fecharModal();
   }
 
-  // Função para carregar os dados de uma tarefa no formulário para edição
-  function editarTarefa(tarefa) {
-    setTitulo(tarefa.titulo);
-    setDescricao(tarefa.descricao);
-    setDataVencimento(tarefa.dataVencimento);
-    setResponsavel(tarefa.responsavel);
-    setTarefaEditandoId(tarefa.id);
+  /**
+   * Prepara o Modal para o modo de edição, carregando a tarefa selecionada.
+   * 
+   * @param tarefa A tarefa que será editada.
+   */
+  function handleEditarTarefa(tarefa: Task) {
+    setTarefaEditando(tarefa);
+    setModalVisivel(true);
   }
 
-  // Função para excluir uma tarefa
-  function excluirTarefa(id) {
+  /**
+   * Remove uma tarefa da lista pelo seu ID.
+   * 
+   * @param id O identificador único da tarefa a ser excluída.
+   */
+  function handleExcluirTarefa(id: number) {
     const listaAtualizada = tarefas.filter(tarefa => tarefa.id !== id);
     setTarefas(listaAtualizada);
-    
-    // Se estiver excluindo a tarefa que está sendo editada no momento, limpa o formulário
-    if (tarefaEditandoId === id) {
-      limparFormulario();
-    }
+  }
+
+  /**
+   * Abre o Modal no modo de criação (limpa o estado de edição anterior, se existir).
+   */
+  function abrirModalNovaTarefa() {
+    setTarefaEditando(null);
+    setModalVisivel(true);
+  }
+
+  /**
+   * Fecha o Modal e reseta o modo de edição.
+   */
+  function fecharModal() {
+    setModalVisivel(false);
+    setTarefaEditando(null);
   }
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.tituloSistema}>Cadastro de Tarefas</Text>
-
-      {/* Formulário */}
-      <View style={styles.formContainer}>
-        <Text style={styles.formTitulo}>
-          {tarefaEditandoId ? 'Editando Tarefa' : 'Nova Tarefa'}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="light-content" backgroundColor="#0D1117" />
+      
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Minhas Tarefas</Text>
+        <Text style={styles.headerSubtitle}>
+          {tarefas.length} {tarefas.length === 1 ? 'tarefa' : 'tarefas'} cadastrada(s)
         </Text>
-
-        {/* Exibe a mensagem de erro se houver */}
-        {erroMsg !== '' && (
-          <Text style={styles.textoErro}>{erroMsg}</Text>
-        )}
-
-        <Text style={styles.label}>Título da Tarefa *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ex: Fazer relatório"
-          value={titulo}
-          onChangeText={setTitulo}
-        />
-
-        <Text style={styles.label}>Descrição *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ex: Detalhes da atividade"
-          value={descricao}
-          onChangeText={setDescricao}
-        />
-
-        <Text style={styles.label}>Data de Vencimento *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ex: 20/10/2023"
-          value={dataVencimento}
-          onChangeText={setDataVencimento}
-        />
-
-        <Text style={styles.label}>Responsável *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ex: João da Silva"
-          value={responsavel}
-          onChangeText={setResponsavel}
-        />
-
-        <View style={styles.botoesFormContainer}>
-          {tarefaEditandoId && (
-            <TouchableOpacity 
-              style={[styles.botao, styles.botaoCancelar]} 
-              onPress={limparFormulario}
-            >
-              <Text style={styles.textoBotao}>Cancelar</Text>
-            </TouchableOpacity>
-          )}
-          
-          <TouchableOpacity 
-            style={[styles.botao, styles.botaoSalvar, tarefaEditandoId ? {flex: 1, marginLeft: 10} : {}]} 
-            onPress={salvarTarefa}
-          >
-            <Text style={styles.textoBotao}>
-              {tarefaEditandoId ? 'Atualizar' : 'Salvar'}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
-      {/* Listagem */}
-      <Text style={styles.subTitulo}>Tarefas Cadastradas</Text>
-      
-      <View style={styles.listaContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      >
         {tarefas.length === 0 ? (
-          <Text style={styles.textoVazio}>Nenhuma tarefa cadastrada.</Text>
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>✨</Text>
+            <Text style={styles.emptyTitle}>Tudo limpo por aqui!</Text>
+            <Text style={styles.emptySubtitle}>
+              Adicione uma nova tarefa clicando no botão abaixo.
+            </Text>
+          </View>
         ) : (
           tarefas.map(tarefa => (
-            <View key={tarefa.id} style={styles.itemTarefa}>
-              <View style={styles.infoTarefa}>
-                <Text style={styles.tituloTarefa}>
-                  {tarefa.id} - {tarefa.titulo}
-                </Text>
-                <Text style={styles.detalheTarefa}>
-                  Descrição: {tarefa.descricao}
-                </Text>
-                <Text style={styles.detalheTarefa}>
-                  Vencimento: {tarefa.dataVencimento}
-                </Text>
-                <Text style={styles.detalheTarefa}>
-                  Responsável: {tarefa.responsavel}
-                </Text>
-              </View>
-
-              <View style={styles.botoesAcaoContainer}>
-                <TouchableOpacity
-                  style={[styles.botaoAcao, styles.botaoEditar]}
-                  onPress={() => editarTarefa(tarefa)}
-                >
-                  <Text style={styles.textoBotaoAcao}>Editar</Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity
-                  style={[styles.botaoAcao, styles.botaoExcluir]}
-                  onPress={() => excluirTarefa(tarefa.id)}
-                >
-                  <Text style={styles.textoBotaoAcao}>Excluir</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <TaskCard
+              key={tarefa.id}
+              tarefa={tarefa}
+              onEditar={handleEditarTarefa}
+              onExcluir={handleExcluirTarefa}
+            />
           ))
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      {/* Floating Action Button (FAB) */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={abrirModalNovaTarefa}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.fabIcon}>+</Text>
+      </TouchableOpacity>
+
+      {/* Modal do Formulário */}
+      <Modal
+        visible={modalVisivel}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={fecharModal}
+      >
+        <View style={styles.modalContainer}>
+          <TaskForm
+            tarefaInicial={tarefaEditando}
+            onSalvar={handleSalvarTarefa}
+            onCancelar={fecharModal}
+          />
+        </View>
+      </Modal>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#0D1117', // Dark background premium
   },
-  scrollContent: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 40,
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 20,
+    backgroundColor: '#0D1117',
   },
-  tituloSistema: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 20,
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
-  formContainer: {
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 8,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    marginBottom: 25,
-  },
-  formTitulo: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#007BFF',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  textoErro: {
-    color: '#DC3545',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    fontSize: 15,
-  },
-  label: {
+  headerSubtitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
-    marginBottom: 5,
-    marginTop: 10,
+    color: '#718096',
+    fontWeight: '500',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    borderRadius: 6,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#FAFAFA',
+  listContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 100, // Espaço para o FAB
+    flexGrow: 1,
   },
-  botoesFormContainer: {
-    flexDirection: 'row',
-    marginTop: 20,
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 80,
   },
-  botao: {
-    padding: 15,
-    borderRadius: 6,
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#E2E8F0',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#A0AEC0',
+    textAlign: 'center',
+    maxWidth: '80%',
+    lineHeight: 20,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 32,
+    right: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#3182CE',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#3182CE',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  botaoSalvar: {
-    backgroundColor: '#007BFF',
+  fabIcon: {
+    fontSize: 32,
+    color: '#FFFFFF',
+    fontWeight: '300',
+    marginTop: -2,
+  },
+  modalContainer: {
     flex: 1,
-  },
-  botaoCancelar: {
-    backgroundColor: '#6C757D',
-    flex: 1,
-  },
-  textoBotao: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  subTitulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  listaContainer: {
-    flex: 1,
-  },
-  textoVazio: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  itemTarefa: {
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    borderLeftWidth: 5,
-    borderLeftColor: '#007BFF',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  infoTarefa: {
-    marginBottom: 10,
-  },
-  tituloTarefa: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 5,
-  },
-  detalheTarefa: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 2,
-  },
-  botoesAcaoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    borderTopWidth: 1,
-    borderTopColor: '#EEE',
-    paddingTop: 10,
-  },
-  botaoAcao: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  botaoEditar: {
-    backgroundColor: '#FFC107', // Amarelo
-  },
-  botaoExcluir: {
-    backgroundColor: '#DC3545', // Vermelho
-  },
-  textoBotaoAcao: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 14,
+    backgroundColor: '#0D1117',
   },
 });
